@@ -31,8 +31,11 @@ export default function Home() {
     }
   };
 
-  const makeName = vehicle?.Make_Name || "Unknown";
-  const makeId = vehicle?.Make_ID ?? "N/A";
+  const makeName = vehicle?.make_name || "Unknown";
+  const modelName = vehicle?.model_name || "Unknown";
+  const vehicleName = vehicle?.name || `${makeName} ${modelName}`.trim();
+  const makeId = vehicle?.make_id ?? "N/A";
+  const modelId = vehicle?.model_id ?? "N/A";
   const isRateLimited = error.includes("429");
 
   return (
@@ -40,9 +43,9 @@ export default function Home() {
       <main className={styles.card}>
         <header className={styles.header}>
           <p className={styles.kicker}>VehiclePull</p>
-          <h1>One button. One random vehicle make.</h1>
+          <h1>One button. One random vehicle model.</h1>
           <p className={styles.subtitle}>
-            One-button random vehicle pulls from the Rails Vehicle API backed by NHTSA.
+            One-button random vehicle model pulls from the Rails Vehicle API backed by NHTSA.
           </p>
         </header>
 
@@ -54,10 +57,10 @@ export default function Home() {
               onClick={fetchVehicle}
               disabled={loading}
             >
-              {loading ? "Fetching..." : "Fetch a vehicle"}
+              {loading ? "Fetching..." : "Fetch a vehicle model"}
             </button>
           </div>
-          <p className={styles.hint}>Persist disabled. One random NHTSA make.</p>
+          <p className={styles.hint}>Persist disabled. One random NHTSA model.</p>
         </section>
 
         <section className={styles.results}>
@@ -96,10 +99,10 @@ export default function Home() {
             <div className={styles.vehicleCard}>
               <div className={styles.vehicleHeader}>
                 <div>
-                  <p className={styles.label}>Make</p>
-                  <h2 className={styles.name}>{makeName}</h2>
+                  <p className={styles.label}>Model</p>
+                  <h2 className={styles.name}>{vehicleName}</h2>
                 </div>
-                <div className={styles.badge}>#{makeId}</div>
+                <div className={styles.badge}>#{modelId}</div>
               </div>
 
               <div className={styles.detailGrid}>
@@ -108,14 +111,18 @@ export default function Home() {
                   <p className={styles.value}>{makeId}</p>
                 </div>
                 <div>
+                  <p className={styles.label}>Model</p>
+                  <p className={styles.value}>{modelName}</p>
+                </div>
+                <div>
                   <p className={styles.label}>Source</p>
                   <p className={styles.value}>NHTSA VPIC</p>
                 </div>
               </div>
 
               <div className={styles.plate}>
-                <span className={styles.plateLabel}>Vehicle Make</span>
-                <span className={styles.plateValue}>{makeName}</span>
+                <span className={styles.plateLabel}>Vehicle Model</span>
+                <span className={styles.plateValue}>{vehicleName}</span>
               </div>
             </div>
           ) : null}

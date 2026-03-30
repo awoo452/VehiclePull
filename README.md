@@ -1,6 +1,6 @@
 # VehiclePull (Next.js)
 
-A tiny Next.js app that pulls a random vehicle make from your Rails Vehicle API.
+A tiny Next.js app that pulls a random vehicle model from your Rails Vehicle API.
 
 ## Local Dev
 
@@ -32,11 +32,11 @@ The UI calls `GET /api/vehicle`, which proxies to:
 ${VEHICLE_API_BASE_URL}/cars/random?persist=false
 ```
 
-The Rails API handles the upstream NHTSA call and returns a single random make.
+The Rails API handles the upstream NHTSA call and returns a single random model.
 
 ## UI Features
 
-- One-button random vehicle pulls.
+- One-button random vehicle model pulls.
 - Loading skeletons.
 - Clean error state when the API is unreachable.
 
