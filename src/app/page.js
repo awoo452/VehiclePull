@@ -1,65 +1,129 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 import styles from "./page.module.css";
 
+const buildApiPath = () => "/api/vehicle";
+
 export default function Home() {
+  const [vehicle, setVehicle] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const fetchVehicle = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(buildApiPath(), { cache: "no-store" });
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const message = payload?.error || `Request failed (${response.status})`;
+        throw new Error(message);
+      }
+
+      setVehicle(payload);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const makeName = vehicle?.Make_Name || "Unknown";
+  const makeId = vehicle?.Make_ID ?? "N/A";
+  const isRateLimited = error.includes("429");
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+      <main className={styles.card}>
+        <header className={styles.header}>
+          <p className={styles.kicker}>VehiclePull</p>
+          <h1>One button. One random vehicle make.</h1>
+          <p className={styles.subtitle}>
+            One-button random vehicle pulls from the Rails Vehicle API backed by NHTSA.
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        </header>
+
+        <section className={styles.controls}>
+          <div className={styles.controlsRow}>
+            <button
+              className={styles.cta}
+              type="button"
+              onClick={fetchVehicle}
+              disabled={loading}
+            >
+              {loading ? "Fetching..." : "Fetch a vehicle"}
+            </button>
+          </div>
+          <p className={styles.hint}>Persist disabled. One random NHTSA make.</p>
+        </section>
+
+        <section className={styles.results}>
+          {error ? (
+            <div className={styles.errorCard}>
+              <p className={styles.errorTitle}>Couldn’t reach the API.</p>
+              <p className={styles.error}>{error}</p>
+              {isRateLimited ? (
+                <p className={styles.errorHint}>
+                  Rate limit hit. Wait a minute and try again.
+                </p>
+              ) : null}
+              <button
+                type="button"
+                className={styles.retry}
+                onClick={fetchVehicle}
+                disabled={loading}
+              >
+                Retry
+              </button>
+            </div>
+          ) : null}
+
+          {loading && !vehicle ? (
+            <div className={styles.skeletonCard} aria-hidden="true">
+              <div className={styles.skeletonTitle} />
+              <div className={styles.skeletonRow}>
+                <div className={styles.skeletonBlock} />
+                <div className={styles.skeletonBlock} />
+              </div>
+              <div className={styles.skeletonImage} />
+            </div>
+          ) : null}
+
+          {vehicle ? (
+            <div className={styles.vehicleCard}>
+              <div className={styles.vehicleHeader}>
+                <div>
+                  <p className={styles.label}>Make</p>
+                  <h2 className={styles.name}>{makeName}</h2>
+                </div>
+                <div className={styles.badge}>#{makeId}</div>
+              </div>
+
+              <div className={styles.detailGrid}>
+                <div>
+                  <p className={styles.label}>Make ID</p>
+                  <p className={styles.value}>{makeId}</p>
+                </div>
+                <div>
+                  <p className={styles.label}>Source</p>
+                  <p className={styles.value}>NHTSA VPIC</p>
+                </div>
+              </div>
+
+              <div className={styles.plate}>
+                <span className={styles.plateLabel}>Vehicle Make</span>
+                <span className={styles.plateValue}>{makeName}</span>
+              </div>
+            </div>
+          ) : null}
+
+          {!vehicle && !loading && !error ? (
+            <p className={styles.empty}>Tap the button to see your first pull.</p>
+          ) : null}
+        </section>
       </main>
     </div>
   );
