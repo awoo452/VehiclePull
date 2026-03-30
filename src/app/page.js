@@ -102,23 +102,20 @@ export default function Home() {
             >
               {loading ? "Fetching..." : "Fetch a vehicle model"}
             </button>
-            <div className={styles.categoryRow}>
-              {categoryOptions.map((option) => (
-                <button
-                  key={option.key}
-                  className={
-                    category === option.key
-                      ? `${styles.toggle} ${styles.toggleActive}`
-                      : styles.toggle
-                  }
-                  type="button"
-                  aria-pressed={category === option.key}
-                  onClick={() => setCategory(option.key)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+            <label className={styles.selectWrap}>
+              <span className={styles.selectLabel}>Category</span>
+              <select
+                className={styles.select}
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+              >
+                {categoryOptions.map((option) => (
+                  <option key={option.key} value={option.key}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <p className={styles.hint}>{hintText}</p>
         </section>
@@ -133,14 +130,7 @@ export default function Home() {
                   Rate limit hit. Wait a minute and try again.
                 </p>
               ) : null}
-              <button
-                type="button"
-                className={styles.retry}
-                onClick={fetchVehicle}
-                disabled={loading}
-              >
-                Retry
-              </button>
+              <p className={styles.errorHint}>Use the button above to retry.</p>
             </div>
           ) : null}
 
@@ -192,10 +182,6 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className={styles.plate}>
-                <span className={styles.plateLabel}>Make / Model</span>
-                <span className={styles.plateValue}>{vehicleName}</span>
-              </div>
             </div>
           ) : null}
 
