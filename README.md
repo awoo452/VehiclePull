@@ -41,6 +41,7 @@ Optional query parameter:
 
 - One-button random vehicle model pulls.
 - Category filters for common vehicle groups.
+- Random model year included in the details.
 - Recent pulls (last 3).
 - Loading skeletons.
 - Clean error state when the API is unreachable.

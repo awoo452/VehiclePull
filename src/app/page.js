@@ -55,6 +55,7 @@ export default function Home() {
       const entry = {
         id: payload?.model_id ?? payload?.model_name ?? "N/A",
         name: payload?.name || "Unknown",
+        year: payload?.model_year ?? "N/A",
         type: payload?.vehicle_type || "N/A",
       };
       setHistory((prev) => {
@@ -73,6 +74,7 @@ export default function Home() {
   const vehicleName = vehicle?.name || `${makeName} ${modelName}`.trim();
   const makeId = vehicle?.make_id ?? "N/A";
   const modelId = vehicle?.model_id ?? "N/A";
+  const modelYear = vehicle?.model_year ?? "N/A";
   const vehicleType = vehicle?.vehicle_type || "N/A";
   const categoryLabel =
     categoryOptions.find((option) => option.key === (vehicle?.category || category))
@@ -157,7 +159,7 @@ export default function Home() {
             <div className={styles.vehicleCard}>
               <div className={styles.vehicleHeader}>
                 <div>
-                  <p className={styles.label}>Model</p>
+                  <p className={styles.label}>Make / Model</p>
                   <h2 className={styles.name}>{vehicleName}</h2>
                 </div>
                 <div className={styles.badge}>#{modelId}</div>
@@ -173,7 +175,11 @@ export default function Home() {
                   <p className={styles.value}>{modelName}</p>
                 </div>
                 <div>
-                  <p className={styles.label}>Type</p>
+                  <p className={styles.label}>Year</p>
+                  <p className={styles.value}>{modelYear}</p>
+                </div>
+                <div>
+                  <p className={styles.label}>Vehicle type</p>
                   <p className={styles.value}>{vehicleType}</p>
                 </div>
                 <div>
@@ -187,7 +193,7 @@ export default function Home() {
               </div>
 
               <div className={styles.plate}>
-                <span className={styles.plateLabel}>Vehicle Model</span>
+                <span className={styles.plateLabel}>Make / Model</span>
                 <span className={styles.plateValue}>{vehicleName}</span>
               </div>
             </div>
@@ -208,6 +214,7 @@ export default function Home() {
                     >
                       <span className={styles.historyId}>{entry.id}</span>
                       <span className={styles.historyName}>{entry.name}</span>
+                      <span className={styles.historyYear}>{entry.year}</span>
                       <span className={styles.historyType}>{entry.type}</span>
                     </div>
                   ))
