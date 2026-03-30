@@ -1,15 +1,22 @@
 const DEFAULT_API_BASE_URL =
   "https://vehicle-api-production-d87b74658d93.herokuapp.com";
 
-const buildApiUrl = (baseUrl) => {
+const buildApiUrl = (baseUrl, requestUrl) => {
+  const incoming = new URL(requestUrl);
   const apiUrl = new URL("/cars/random", baseUrl);
   apiUrl.searchParams.set("persist", "false");
+
+  const category = incoming.searchParams.get("category");
+  if (category) {
+    apiUrl.searchParams.set("category", category);
+  }
+
   return apiUrl;
 };
 
-export async function GET() {
+export async function GET(request) {
   const baseUrl = process.env.VEHICLE_API_BASE_URL || DEFAULT_API_BASE_URL;
-  const apiUrl = buildApiUrl(baseUrl);
+  const apiUrl = buildApiUrl(baseUrl, request.url);
 
   try {
     const response = await fetch(apiUrl, {

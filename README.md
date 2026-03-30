@@ -34,9 +34,13 @@ ${VEHICLE_API_BASE_URL}/cars/random?persist=false
 
 The Rails API handles the upstream NHTSA call and returns a single random model.
 
+Optional query parameter:
+- `category=all|passenger|mpv|truck|bus|two_wheel|low_speed`
+
 ## UI Features
 
 - One-button random vehicle model pulls.
+- Category filters for common vehicle groups.
 - Loading skeletons.
 - Clean error state when the API is unreachable.
 

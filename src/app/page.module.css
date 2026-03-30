@@ -99,6 +99,12 @@
   align-items: center;
 }
 
+.categoryRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .cta {
   border: none;
   border-radius: 18px;
@@ -128,6 +134,27 @@
 .cta:not(:disabled):focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 4px;
+}
+
+.toggle {
+  border-radius: 999px;
+  padding: 10px 16px;
+  border: 1px solid rgba(40, 60, 100, 0.2);
+  background: #f7f9ff;
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.toggle:hover {
+  border-color: rgba(40, 60, 100, 0.4);
+}
+
+.toggleActive {
+  background: #101826;
+  color: #f7f9ff;
+  border-color: #101826;
 }
 
 .hint {
@@ -319,6 +346,15 @@
 
   .controlsRow {
     width: 100%;
+  }
+
+  .categoryRow {
+    width: 100%;
+  }
+
+  .toggle {
+    width: 100%;
+    text-align: center;
   }
 }
 

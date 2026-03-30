@@ -1,21 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./page.module.css";
 
-const buildApiPath = () => "/api/vehicle";
+const buildApiPath = ({ category }) => {
+  const params = new URLSearchParams();
+  if (category) {
+    params.set("category", category);
+  }
+
+  const query = params.toString();
+  return query ? `/api/vehicle?${query}` : "/api/vehicle";
+};
 
 export default function Home() {
   const [vehicle, setVehicle] = useState(null);
+  const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const categoryOptions = useMemo(
+    () => [
+      { key: "all", label: "All" },
+      { key: "passenger", label: "Passenger" },
+      { key: "mpv", label: "MPV/SUV" },
+      { key: "truck", label: "Trucks" },
+      { key: "bus", label: "Buses" },
+      { key: "two_wheel", label: "Motorcycles" },
+      { key: "low_speed", label: "Low speed" },
+    ],
+    []
+  );
+
+  const hintText =
+    category === "all"
+      ? "Category: All road vehicles (trailers excluded)."
+      : `Category: ${categoryOptions.find((option) => option.key === category)?.label || "Custom"}.`;
 
   const fetchVehicle = async () => {
     setLoading(true);
     setError("");
 
     try {
-      const response = await fetch(buildApiPath(), { cache: "no-store" });
+      const response = await fetch(buildApiPath({ category }), { cache: "no-store" });
       const payload = await response.json().catch(() => ({}));
 
       if (!response.ok) {
@@ -36,6 +63,10 @@ export default function Home() {
   const vehicleName = vehicle?.name || `${makeName} ${modelName}`.trim();
   const makeId = vehicle?.make_id ?? "N/A";
   const modelId = vehicle?.model_id ?? "N/A";
+  const vehicleType = vehicle?.vehicle_type || "N/A";
+  const categoryLabel =
+    categoryOptions.find((option) => option.key === (vehicle?.category || category))
+      ?.label || "N/A";
   const isRateLimited = error.includes("429");
 
   return (
@@ -59,8 +90,25 @@ export default function Home() {
             >
               {loading ? "Fetching..." : "Fetch a vehicle model"}
             </button>
+            <div className={styles.categoryRow}>
+              {categoryOptions.map((option) => (
+                <button
+                  key={option.key}
+                  className={
+                    category === option.key
+                      ? `${styles.toggle} ${styles.toggleActive}`
+                      : styles.toggle
+                  }
+                  type="button"
+                  aria-pressed={category === option.key}
+                  onClick={() => setCategory(option.key)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <p className={styles.hint}>Persist disabled. One random NHTSA model.</p>
+          <p className={styles.hint}>{hintText}</p>
         </section>
 
         <section className={styles.results}>
@@ -113,6 +161,14 @@ export default function Home() {
                 <div>
                   <p className={styles.label}>Model</p>
                   <p className={styles.value}>{modelName}</p>
+                </div>
+                <div>
+                  <p className={styles.label}>Type</p>
+                  <p className={styles.value}>{vehicleType}</p>
+                </div>
+                <div>
+                  <p className={styles.label}>Category</p>
+                  <p className={styles.value}>{categoryLabel}</p>
                 </div>
                 <div>
                   <p className={styles.label}>Source</p>
