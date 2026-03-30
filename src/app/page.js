@@ -15,6 +15,7 @@ const buildApiPath = ({ category }) => {
 
 export default function Home() {
   const [vehicle, setVehicle] = useState(null);
+  const [history, setHistory] = useState([]);
   const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -51,6 +52,15 @@ export default function Home() {
       }
 
       setVehicle(payload);
+      const entry = {
+        id: payload?.model_id ?? payload?.model_name ?? "N/A",
+        name: payload?.name || "Unknown",
+        type: payload?.vehicle_type || "N/A",
+      };
+      setHistory((prev) => {
+        const filtered = prev.filter((item) => item.id !== entry.id);
+        return [entry, ...filtered].slice(0, 3);
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -186,6 +196,24 @@ export default function Home() {
           {!vehicle && !loading && !error ? (
             <p className={styles.empty}>Tap the button to see your first pull.</p>
           ) : null}
+
+          <div className={styles.history}>
+            <p className={styles.historyLabel}>Recent pulls</p>
+            <div className={styles.historyRow}>
+              {history.length
+                ? history.map((entry) => (
+                    <div
+                      key={`${entry.id}-${entry.name}`}
+                      className={styles.historyChip}
+                    >
+                      <span className={styles.historyId}>{entry.id}</span>
+                      <span className={styles.historyName}>{entry.name}</span>
+                      <span className={styles.historyType}>{entry.type}</span>
+                    </div>
+                  ))
+                : "No history yet."}
+            </div>
+          </div>
         </section>
       </main>
     </div>
