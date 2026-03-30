@@ -104,19 +104,17 @@ export default function Home() {
             </button>
             <label className={styles.selectWrap}>
               <span className={styles.selectLabel}>Category</span>
-              <span className={styles.selectShell}>
-                <select
-                  className={styles.select}
-                  value={category}
-                  onChange={(event) => setCategory(event.target.value)}
-                >
-                  {categoryOptions.map((option) => (
-                    <option key={option.key} value={option.key}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </span>
+              <select
+                className={styles.select}
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+              >
+                {categoryOptions.map((option) => (
+                  <option key={option.key} value={option.key}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           <p className={styles.hint}>{hintText}</p>
