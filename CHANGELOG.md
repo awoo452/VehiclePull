@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.11] - 2026-03-30
+### Changed
+- Removed the low-speed category filter since the upstream API does not support it.
+
 ## [0.0.10] - 2026-03-30
 ### Changed
 - Surface upstream error details and request IDs in the error panel to help debug low-speed failures.

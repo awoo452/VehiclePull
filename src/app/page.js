@@ -28,7 +28,6 @@ export default function Home() {
       { key: "truck", label: "Trucks" },
       { key: "bus", label: "Buses" },
       { key: "two_wheel", label: "Motorcycles" },
-      { key: "low_speed", label: "Low speed" },
     ],
     []
   );
