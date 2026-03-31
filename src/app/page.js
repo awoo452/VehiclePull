@@ -18,7 +18,7 @@ export default function Home() {
   const [history, setHistory] = useState([]);
   const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   const categoryOptions = useMemo(
     () => [
@@ -40,7 +40,7 @@ export default function Home() {
 
   const fetchVehicle = async () => {
     setLoading(true);
-    setError("");
+    setError(null);
 
     try {
       const response = await fetch(buildApiPath({ category }), { cache: "no-store" });
@@ -48,7 +48,13 @@ export default function Home() {
 
       if (!response.ok) {
         const message = payload?.error || `Request failed (${response.status})`;
-        throw new Error(message);
+        setError({
+          message,
+          status: response.status,
+          details: payload?.details || null,
+          requestId: payload?.request_id || null,
+        });
+        return;
       }
 
       setVehicle(payload);
@@ -63,7 +69,12 @@ export default function Home() {
         return [entry, ...filtered].slice(0, 3);
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError({
+        message: err instanceof Error ? err.message : "Something went wrong.",
+        status: null,
+        details: null,
+        requestId: null,
+      });
     } finally {
       setLoading(false);
     }
@@ -79,7 +90,31 @@ export default function Home() {
   const categoryLabel =
     categoryOptions.find((option) => option.key === (vehicle?.category || category))
       ?.label || "N/A";
-  const isRateLimited = error.includes("429");
+  const errorMessage = error?.message || "";
+  const errorDetails = error?.details || null;
+  const errorRequestId = error?.requestId || null;
+  const isRateLimited = error?.status === 429 || errorMessage.includes("429");
+
+  const detailLines = (() => {
+    if (!errorDetails || typeof errorDetails !== "object") {
+      return [];
+    }
+
+    const lines = [
+      ["Upstream", errorDetails.service],
+      ["Upstream status", errorDetails.status || errorDetails.response_code],
+      ["Category", errorDetails.category],
+      ["Vehicle type", errorDetails.vehicle_type_query],
+      ["Model year", errorDetails.model_year],
+      ["Attempt", errorDetails.attempt],
+      ["Make", errorDetails.make_name],
+      ["URL", errorDetails.url],
+    ];
+
+    return lines
+      .filter(([, value]) => value !== undefined && value !== null && value !== "")
+      .map(([label, value]) => `${label}: ${value}`);
+  })();
 
   return (
     <div className={styles.page}>
@@ -124,7 +159,17 @@ export default function Home() {
           {error ? (
             <div className={styles.errorCard}>
               <p className={styles.errorTitle}>Couldn’t reach the API.</p>
-              <p className={styles.error}>{error}</p>
+              <p className={styles.error}>{errorMessage}</p>
+              {detailLines.length
+                ? detailLines.map((line) => (
+                    <p key={line} className={styles.errorHint}>
+                      {line}
+                    </p>
+                  ))
+                : null}
+              {errorRequestId ? (
+                <p className={styles.errorHint}>Request ID: {errorRequestId}</p>
+              ) : null}
               {isRateLimited ? (
                 <p className={styles.errorHint}>
                   Rate limit hit. Wait a minute and try again.
